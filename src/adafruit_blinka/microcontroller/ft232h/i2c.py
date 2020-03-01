@@ -2,11 +2,13 @@ from adafruit_blinka.microcontroller.ft232h.pin import Pin
 
 class I2C:
 
-    def __init__(self, *, frequency=400000):
+    def __init__(self, *, frequency=400000, url='ftdi://ftdi:ft232h:1/1'):
         # change GPIO controller to I2C
         from pyftdi.i2c import I2cController
         self._i2c = I2cController()
-        self._i2c.configure('ftdi://ftdi:ft232h/1', frequency=frequency)
+        # self._i2c.configure('ftdi://ftdi:ft232h/1', frequency=frequency)
+        self._i2c.configure(url, frequency=frequency)
+
         Pin.ft232h_gpio = self._i2c.get_gpio()
 
     def scan(self):

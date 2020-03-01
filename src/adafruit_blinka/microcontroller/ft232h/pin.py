@@ -7,15 +7,20 @@ class Pin:
     HIGH = 1
 
     ft232h_gpio = None
-
-    def __init__(self, pin_id=None):
+    controller_one = None
+    controller_two = None
+    def __init__(self, pin_id=None, url="ftdi://ftdi:ft232h:1/1"):
         # setup GPIO controller if not done yet
         # use one provided by I2C as default
         if not Pin.ft232h_gpio:
             from pyftdi.i2c import I2cController
             i2c = I2cController()
-            i2c.configure("ftdi://ftdi:ft232h/1")
+            i2c.configure("ftdi://ftdi:ft232h:2/1")
             Pin.ft232h_gpio = i2c.get_gpio()
+            Pin.controller_one = i2c.get_gpio()
+            i2c_second = I2cController()
+            i2c_second.configure("ftdi://ftdi:ft232h:2/1")
+            Pin.controller_two=i2c_second.get_gpio()
         # check if pin is valid
         if pin_id:
             if Pin.ft232h_gpio.all_pins & 1 << pin_id == 0:
@@ -23,24 +28,24 @@ class Pin:
         # ID is just bit position
         self.id = pin_id
 
-    def init(self, mode=IN, pull=None):
+    def init(self, controller, mode=IN, pull=None):
         if not self.id:
             raise RuntimeError("Can not init a None type pin.")
         # FT232H does't have configurable internal pulls?
         if pull:
             raise ValueError("Internal pull up/down not currently supported.")
-        pin_mask = Pin.ft232h_gpio.pins | 1 << self.id
-        current = Pin.ft232h_gpio.direction
+        pin_mask = Pin.controller.pins | 1 << self.id
+        current = Pin.controller.direction
         if mode == self.OUT:
             current |= 1 << self.id
         else:
             current &= ~(1 << self.id)
-        Pin.ft232h_gpio.set_direction(pin_mask, current)
+        Pin.controller.set_direction(pin_mask, current)
 
-    def value(self, val=None):
+    def value(self, controller, val=None):
         if not self.id:
             raise RuntimeError("Can not access a None type pin.")
-        current = Pin.ft232h_gpio.read(with_output=True)
+        current = Pin.controller.read(with_output=True)
         # read
         if val is None:
             return 1 if current & 1 << self.id != 0 else 0
@@ -51,7 +56,7 @@ class Pin:
             else:
                 current &= ~(1 << self.id)
             # must mask out any input pins
-            Pin.ft232h_gpio.write(current & Pin.ft232h_gpio.direction)
+            Pin.controller.write(current & Pin.controller.direction)
         # release the kraken
         else:
             raise RuntimeError("Invalid value for pin")

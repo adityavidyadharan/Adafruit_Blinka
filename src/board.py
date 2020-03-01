@@ -144,11 +144,13 @@ else:
     raise NotImplementedError("Board not supported {}".format(board_id))
 
 def I2C():
+    print('using this interface')
     """The singleton I2C interface"""
     import busio
     return busio.I2C(SCL, SDA)
 
 def SPI():
+    print('using the other')
     """The singleton SPI interface"""
     import busio
     return busio.SPI(SCLK, MOSI, MISO)

@@ -80,8 +80,8 @@ Pull.DOWN = Pull()
 class DigitalInOut(ContextManaged):
     _pin = None
 
-    def __init__(self, pin):
-        self._pin = Pin(pin.id)
+    def __init__(self, pin, url):
+        self._pin = Pin(pin_id=pin.id, url=url)
         self.direction = Direction.INPUT
 
     def switch_to_output(self, value=False, drive_mode=DriveMode.PUSH_PULL):
@@ -132,19 +132,19 @@ class DigitalInOut(ContextManaged):
             raise AttributeError("Not an input")
 
     @pull.setter
-    def pull(self, pul):
+    def pull(self, chip, pul):
         if self.direction is Direction.INPUT:
             self.__pull = pul
             if pul is Pull.UP:
-                self._pin.init(mode=Pin.IN, pull=Pin.PULL_UP)
+                self._pin.init(controller=chip, mode=Pin.IN, pull=Pin.PULL_UP)
             elif pul is Pull.DOWN:
                 if hasattr(Pin, "PULL_DOWN"):
-                    self._pin.init(mode=Pin.IN, pull=Pin.PULL_DOWN)
+                    self._pin.init(controller=chip, mode=Pin.IN, pull=Pin.PULL_DOWN)
                 else:
                     raise NotImplementedError("{} unsupported on {}".format(
                         Pull.DOWN, board_id))
             elif pul is None:
-                self._pin.init(mode=Pin.IN, pull=None)
+                self._pin.init(controller=chip, mode=Pin.IN, pull=None)
             else:
                 raise AttributeError("Not a Pull")
         else:
@@ -158,9 +158,9 @@ class DigitalInOut(ContextManaged):
             raise AttributeError("Not an output")
 
     @drive_mode.setter
-    def drive_mode(self, mod):
+    def drive_mode(self,chip, mod):
         self.__drive_mode = mod
         if mod is DriveMode.OPEN_DRAIN:
-            self._pin.init(mode=Pin.OPEN_DRAIN)
+            self._pin.init(controller=chip, mode=Pin.OPEN_DRAIN)
         elif mod is DriveMode.PUSH_PULL:
-            self._pin.init(mode=Pin.OUT)
+            self._pin.init(controller=chip, mode=Pin.OUT)
