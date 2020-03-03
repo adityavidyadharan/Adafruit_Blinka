@@ -80,8 +80,9 @@ Pull.DOWN = Pull()
 class DigitalInOut(ContextManaged):
     _pin = None
 
-    def __init__(self, pin):
-        self._pin = Pin(pin_id=pin.id)
+    def __init__(self, pin, control):
+        self._pin = Pin(control=control, pin_id=pin.id)
+        self._control = control
         self.direction = Direction.INPUT
 
     def switch_to_output(self, value=False, drive_mode=DriveMode.PUSH_PULL):
@@ -104,11 +105,11 @@ class DigitalInOut(ContextManaged):
     def direction(self, dir):
         self.__direction = dir
         if dir is Direction.OUTPUT:
-            self._pin.init(mode=Pin.OUT)
+            self._pin.init(control=self._control, mode=Pin.OUT)
             self.value = False
             self.drive_mode = DriveMode.PUSH_PULL
         elif dir is Direction.INPUT:
-            self._pin.init(mode=Pin.IN)
+            self._pin.init(control=self._control, mode=Pin.IN)
             self.pull = None
         else:
             raise AttributeError("Not a Direction")

@@ -9,7 +9,7 @@ class Pin:
     ft232h_gpio = None
     controller_one = None
     controller_two = None
-    def __init__(self, controller="one", pin_id=None):
+    def __init__(self, control="one", pin_id=None):
         # setup GPIO controller if not done yet
         # use one provided by I2C as default
         if not Pin.ft232h_gpio:
@@ -26,13 +26,13 @@ class Pin:
             if Pin.ft232h_gpio.all_pins & 1 << pin_id == 0:
                 raise ValueError("Can not use pin {} as GPIO.".format(pin_id))
         # ID is just bit position
-        if controller=="one":
+        if control=="one":
             self.controller=Pin.controller_one
         else:
             self.controller=Pin.controller_two
         self.id = pin_id
 
-    def init(self, controller, mode=IN, pull=None):
+    def init(self, mode=IN, pull=None):
         if not self.id:
             raise RuntimeError("Can not init a None type pin.")
         # FT232H does't have configurable internal pulls?
