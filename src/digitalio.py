@@ -80,9 +80,8 @@ Pull.DOWN = Pull()
 class DigitalInOut(ContextManaged):
     _pin = None
 
-    def __init__(self, pin, control):
-        self._pin = Pin(control=control, pin_id=pin.id)
-        self._control = control
+    def __init__(self, pin, _control):
+        self._pin = Pin(control=_control, pin_id=pin.id)
         self.direction = Direction.INPUT
 
     def switch_to_output(self, value=False, drive_mode=DriveMode.PUSH_PULL):
@@ -105,11 +104,11 @@ class DigitalInOut(ContextManaged):
     def direction(self, dir):
         self.__direction = dir
         if dir is Direction.OUTPUT:
-            self._pin.init(control=self._control, mode=Pin.OUT)
+            self._pin.init(mode=Pin.OUT)
             self.value = False
             self.drive_mode = DriveMode.PUSH_PULL
         elif dir is Direction.INPUT:
-            self._pin.init(control=self._control, mode=Pin.IN)
+            self._pin.init(mode=Pin.IN)
             self.pull = None
         else:
             raise AttributeError("Not a Direction")
@@ -137,15 +136,15 @@ class DigitalInOut(ContextManaged):
         if self.direction is Direction.INPUT:
             self.__pull = pul
             if pul is Pull.UP:
-                self._pin.init(controller=chip, mode=Pin.IN, pull=Pin.PULL_UP)
+                self._pin.init(mode=Pin.IN, pull=Pin.PULL_UP)
             elif pul is Pull.DOWN:
                 if hasattr(Pin, "PULL_DOWN"):
-                    self._pin.init(controller=chip, mode=Pin.IN, pull=Pin.PULL_DOWN)
+                    self._pin.init(mode=Pin.IN, pull=Pin.PULL_DOWN)
                 else:
                     raise NotImplementedError("{} unsupported on {}".format(
                         Pull.DOWN, board_id))
             elif pul is None:
-                self._pin.init(controller=chip, mode=Pin.IN, pull=None)
+                self._pin.init(mode=Pin.IN, pull=None)
             else:
                 raise AttributeError("Not a Pull")
         else:
@@ -162,6 +161,6 @@ class DigitalInOut(ContextManaged):
     def drive_mode(self,chip, mod):
         self.__drive_mode = mod
         if mod is DriveMode.OPEN_DRAIN:
-            self._pin.init(controller=chip, mode=Pin.OPEN_DRAIN)
+            self._pin.init(mode=Pin.OPEN_DRAIN)
         elif mod is DriveMode.PUSH_PULL:
-            self._pin.init(controller=chip, mode=Pin.OUT)
+            self._pin.init(mode=Pin.OUT)
