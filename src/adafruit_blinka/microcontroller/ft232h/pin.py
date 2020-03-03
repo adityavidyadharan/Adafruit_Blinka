@@ -9,7 +9,7 @@ class Pin:
     ft232h_gpio = None
     controller_one = None
     controller_two = None
-    def __init__(self, pin_id=None, url="ftdi://ftdi:ft232h:1/1"):
+    def __init__(self, controller="one", pin_id=None):
         # setup GPIO controller if not done yet
         # use one provided by I2C as default
         if not Pin.ft232h_gpio:
@@ -26,6 +26,10 @@ class Pin:
             if Pin.ft232h_gpio.all_pins & 1 << pin_id == 0:
                 raise ValueError("Can not use pin {} as GPIO.".format(pin_id))
         # ID is just bit position
+        if controller=="one":
+            self.controller=controller_one
+        else:
+            self.controller=controller_two
         self.id = pin_id
 
     def init(self, controller, mode=IN, pull=None):
@@ -34,18 +38,18 @@ class Pin:
         # FT232H does't have configurable internal pulls?
         if pull:
             raise ValueError("Internal pull up/down not currently supported.")
-        pin_mask = Pin.controller.pins | 1 << self.id
-        current = Pin.controller.direction
+        pin_mask = self.controller.pins | 1 << self.id
+        current = self.controller.direction
         if mode == self.OUT:
             current |= 1 << self.id
         else:
             current &= ~(1 << self.id)
-        Pin.controller.set_direction(pin_mask, current)
+        self.controller.set_direction(pin_mask, current)
 
     def value(self, controller, val=None):
         if not self.id:
             raise RuntimeError("Can not access a None type pin.")
-        current = Pin.controller.read(with_output=True)
+        current = self.controller.read(with_output=True)
         # read
         if val is None:
             return 1 if current & 1 << self.id != 0 else 0
@@ -56,7 +60,7 @@ class Pin:
             else:
                 current &= ~(1 << self.id)
             # must mask out any input pins
-            Pin.controller.write(current & Pin.controller.direction)
+            self.controller.write(current & Pin.controller.direction)
         # release the kraken
         else:
             raise RuntimeError("Invalid value for pin")
