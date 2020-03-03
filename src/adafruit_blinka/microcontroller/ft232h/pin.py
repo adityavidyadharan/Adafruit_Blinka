@@ -67,18 +67,31 @@ class Pin:
 
 # create pin instances for each pin
 # D0 to D3 are used by I2C/SPI
-D4 = Pin(4)
-D5 = Pin(5)
-D6 = Pin(6)
-D7 = Pin(7)
-C0 = Pin(8)
-C1 = Pin(9)
-C2 = Pin(10)
-C3 = Pin(11)
-C4 = Pin(12)
-C5 = Pin(13)
-C6 = Pin(14)
-C7 = Pin(15)
+D4_1 = Pin(4, "one")
+D5_1 = Pin(5, "one")
+D6_1 = Pin(6, "one")
+D7_1 = Pin(7, "one")
+C0_1 = Pin(8, "one")
+C1_1 = Pin(9, "one")
+C2_1 = Pin(10, "one")
+C3_1 = Pin(11, "one")
+C4_1 = Pin(12, "one")
+C5_1 = Pin(13, "one")
+C6_1 = Pin(14, "one")
+C7_1 = Pin(15, "one")
+
+D4_2 = Pin(4, "two")
+D5_2 = Pin(5, "two")
+D6_2 = Pin(6, "two")
+D7_2 = Pin(7, "two")
+C0_2 = Pin(8, "two")
+C1_2 = Pin(9, "two")
+C2_2 = Pin(10, "two")
+C3_2 = Pin(11, "two")
+C4_2 = Pin(12, "two")
+C5_2 = Pin(13, "two")
+C6_2 = Pin(14, "two")
+C7_2 = Pin(15, "two")
 # C8 and C9 are not GPIO
 
 # create None type pins for I2C and SPI since they are expected to be defined
