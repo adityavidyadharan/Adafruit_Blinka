@@ -27,9 +27,9 @@ class Pin:
                 raise ValueError("Can not use pin {} as GPIO.".format(pin_id))
         # ID is just bit position
         if controller=="one":
-            self.controller=controller_one
+            self.controller=Pin.controller_one
         else:
-            self.controller=controller_two
+            self.controller=Pin.controller_two
         self.id = pin_id
 
     def init(self, controller, mode=IN, pull=None):
